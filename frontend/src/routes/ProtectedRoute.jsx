@@ -1,40 +1,30 @@
-/**
- * ProtectedRoute.jsx
- *
- * Phase 0 stub — full implementation in Phase 3.
- *
- * Will redirect unauthenticated users to Sign In.
- * Will optionally restrict by role (Admin-only routes).
- * Usage (Phase 3+):
- *   <Route element={<ProtectedRoute />}>
- *     <Route path="/employees" element={<EmployeesPage />} />
- *   </Route>
- *   <Route element={<ProtectedRoute requiredRole="admin" />}>
- *     <Route path="/admin/..." element={<AdminPage />} />
- *   </Route>
- */
+import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-/**
- * @param {string} [requiredRole] - If provided, also checks that the user
- *   has this role; otherwise 403s by redirecting to '/'.
- *   Roles: 'admin' | 'employee'.
- */
-function ProtectedRoute({ requiredRole }) {
-  const { isAuthenticated, role } = useAuth();
+export function ProtectedRoute({ allowedRoles }) {
+  const { user, token, isLoading } = useAuth();
 
-  // Phase 3 TODO: replace stub with real redirect to '/signin'.
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="font-serif text-xl text-muted-foreground animate-pulse">Loading...</div>
+      </div>
+    );
   }
 
-  if (requiredRole && role !== requiredRole) {
-    // Unauthorized role — redirect to dashboard root.
-    return <Navigate to="/" replace />;
+  if (!token || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 text-center">
+        <h2 className="text-4xl font-bold font-serif text-foreground mb-4">Access Denied</h2>
+        <p className="text-lg text-muted-foreground">You don't have permission to view this page.</p>
+      </div>
+    );
   }
 
   return <Outlet />;
 }
-
-export default ProtectedRoute;
