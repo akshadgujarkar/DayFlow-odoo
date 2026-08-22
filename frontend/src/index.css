@@ -1,3 +1,45 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
+@layer base {
+  :root {
+    --background: #FAFAF8;
+    --foreground: #1A1A1A;
+    
+    --muted: #F5F3F0;
+    --muted-foreground: #6B6B6B;
+    
+    --accent: #B8860B;
+    --accent-secondary: #D4A84B;
+    --accent-foreground: #FFFFFF;
+    
+    --border: #E8E4DF;
+    --border-hover: #D1CFC9;
+    
+    --card: #FFFFFF;
+    --ring: #B8860B;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Source Sans 3', system-ui, sans-serif;
+    line-height: 1.75;
+    letter-spacing: 0.01em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+@layer utilities {
+  .small-caps {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+}
