@@ -5,7 +5,7 @@ import { ProtectedRoute } from './routes/ProtectedRoute';
 import { Layout } from './modules/layout/Layout';
 import { SignIn } from './modules/auth/SignIn';
 import { SignUp } from './modules/auth/SignUp';
-import { DashboardStub } from './modules/employees/DashboardStub';
+import { Dashboard } from './modules/employees/Dashboard';
 
 function App() {
   return (
@@ -17,7 +17,7 @@ function App() {
           
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
-              <Route path="/" element={<DashboardStub />} />
+              <Route path="/" element={<Dashboard />} />
               <Route path="/attendance" element={
                 <div className="flex justify-center items-center h-64 text-muted-foreground font-serif text-2xl">
                   Attendance Module Placeholder
