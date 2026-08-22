@@ -6,6 +6,14 @@ import { Layout } from './modules/layout/Layout';
 import { SignIn } from './modules/auth/SignIn';
 import { SignUp } from './modules/auth/SignUp';
 import { Dashboard } from './modules/employees/Dashboard';
+import { Profile } from './modules/profile/Profile';
+import { useAuth } from './context/AuthContext';
+
+function ProfileRedirect() {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  return <Navigate to={`/profile/${user.id}`} replace />;
+}
 
 function App() {
   return (
@@ -28,11 +36,8 @@ function App() {
                   Time Off Module Placeholder
                 </div>
               } />
-              <Route path="/profile" element={
-                <div className="flex justify-center items-center h-64 text-muted-foreground font-serif text-2xl">
-                  My Profile Placeholder
-                </div>
-              } />
+              <Route path="/profile" element={<ProfileRedirect />} />
+              <Route path="/profile/:id" element={<Profile />} />
             </Route>
           </Route>
           
