@@ -18,13 +18,12 @@
  * @param {'admin' | 'employee'} requiredRole
  */
 function roleGuard(requiredRole) {
-  return function (_req, _res, next) {
-    // Phase 2 TODO: enable role enforcement once authGuard populates req.user.
-    // if (!req.user || req.user.role !== requiredRole) {
-    //   return res.status(403).json({
-    //     error: { code: 'FORBIDDEN', message: 'Insufficient permissions.' },
-    //   });
-    // }
+  return function (req, res, next) {
+    if (!req.user || req.user.role !== requiredRole) {
+      return res.status(403).json({
+        error: { code: 'FORBIDDEN', message: 'Insufficient permissions.' },
+      });
+    }
     next();
   };
 }
