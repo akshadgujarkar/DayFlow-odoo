@@ -1,175 +1,180 @@
 # PRD.md — Product Requirements Document
-## Dayflow — Human Resource Management System (HRMS)
 
-> Source note: This document reconciles two sources — (1) the written project description ("Dayflow" HRMS spec), and (2) an Excalidraw board of **UI screen wireframes** (Sign Up, Sign In, Employees list, Employee Profile, Salary Info, Attendance, Time Off) with annotation callouts. The Excalidraw board is **not** a system/technical architecture diagram — it contains no frontend/backend/database boxes or data-flow arrows. All architecture-level content in `Architecture.md` is therefore drawn almost entirely from the text description, and is marked accordingly. See `Architecture.md` and the Final Quality Check at the end of this doc-set summary for a full list of contradictions found between the two sources.
+**Project:** Human Resource Management System (HRMS)
+**Source documents:** `HRMS_Architecture.md` (project description, derived from an Excalidraw design titled *"Human Resource Management System - 8 hours"*).
+
+> **Note on sources:** Only one source document was provided for this task (`HRMS_Architecture.md`). It states that it was itself generated from an Excalidraw diagram, but no separate Excalidraw image file was supplied to this session. All content below is therefore treated as coming from a single, already-reconciled text source. No text-vs-diagram contradictions could be checked because the raw diagram was not attached — see the **Final Quality Check** summary at the end of this response for details.
 
 ---
 
 ## Product Overview
 
-**Product name:** Dayflow (tagline: *"Every workday, perfectly aligned."*) — a Human Resource Management System (HRMS).
+**Product name:** Human Resource Management System (HRMS)
 
-**Description:** Dayflow digitizes and streamlines core HR operations: employee onboarding, profile management, attendance tracking, leave/time-off management, payroll (salary) visibility, and approval workflows for Admins/HR Officers, for two user roles — Admin/HR Officer and Employee.
+**One-paragraph description:** HRMS is a web/app-based platform that lets a company manage its employees end-to-end — from account creation, daily attendance and check-in/check-out, to time-off requests and approvals, to salary/payslip computation. Two roles exist: **Admin / HR Officer** (full control) and **Employee** (self-service, scoped visibility).
 
-**Problem being solved:** Manual/fragmented handling of HR operations (attendance, leave requests, payroll visibility, approvals) across a company.
+**Problem being solved:** Companies need a single system where HR can onboard employees (without self-registration), track daily presence, manage leave requests/approvals, and automatically compute payable salary based on attendance and approved leave — replacing manual/disconnected tracking of these processes.
 
-**Product vision:** *Not specified* beyond the tagline "Every workday, perfectly aligned."
+**Product vision:** *Not specified* in the source beyond the operational description above.
 
-**Product goals:**
-- Provide secure, role-based authentication.
-- Centralize employee profile data (personal, job, salary, documents).
-- Digitize attendance tracking (daily/weekly).
-- Digitize leave/time-off requests and approvals.
-- Give employees read-only payroll visibility and give Admins full payroll control.
+**Product goals** (derived from source):
+- Centralize employee profile, attendance, time-off, and salary data in one system.
+- Give Admin/HR full administrative control while giving Employees safe, scoped self-service access.
+- Make attendance the single source of truth that automatically drives payable-days and payslip calculation.
 
-**Expected outcomes:** *Not specified* in either source (no explicit success metrics/KPIs given).
+**Expected outcomes:** *Not specified* explicitly (e.g., no stated metrics/KPIs). **Inference:** reduced manual HR effort and fewer payroll errors, since attendance → payable days → salary is described as an automatic pipeline.
 
 ---
 
 ## Target Users
 
-### Admin / HR Officer
-- **Description (text):** Manages employees, approves leave & attendance, views payroll details.
-- **Diagram evidence:** Sees the full Employees list, all employees' Attendance for the current day, Approve/Reject buttons on the Time Off list, and an Admin-only "Salary Info" tab on an employee's profile (annotated *"Salary Info tab Should only be visible to Admin"*) with full editing rights over wage/salary components.
-- **Diagram-only detail (Inference labeled in source as a fixed workflow, not a persona label):** Admin/HR is also responsible for **creating employee accounts** — per an annotation, normal employees cannot self-register; the Admin/HR creates each employee's login, and the system auto-generates both the Login ID and a first-time password.
+### 1. Admin / HR Officer
+- **Who they are:** Company HR staff or administrators.
+- **Goals:** Onboard employees, manage company data, review attendance, approve/reject time-off, manage salary and allocations.
+- **Needs:** Full CRUD on employees, visibility into all employees' attendance and time-off, control over Salary Info.
+- **Pain points:** *Not specified* explicitly; **Inference:** manual payroll/attendance reconciliation is the underlying pain point the system addresses.
+- **Interaction:** Creates employee accounts (system auto-generates Login ID + first password), edits employee profiles fully, views/edits Salary Info, views all-employee attendance, approves/rejects time-off, manages leave allocations, uses Check-In/Check-Out like any user.
 
-### Employee
-- **Description (text):** Views personal profile, attendance, applies for leave, views salary details (read-only).
-- **Diagram evidence:** Sees only their own attendance, only their own Time Off requests/balances, a read-only "Salary Info" that is otherwise hidden from them (per the Admin-only annotation), and profile sections (Resume, Private Info, About, Skills, Certifications) they can partially edit.
+### 2. Employee (Normal User)
+- **Who they are:** Regular company staff, cannot self-register.
+- **Goals:** View and partially edit their own profile, check in/out, view their own attendance, request time off.
+- **Needs:** Clear day-wise attendance view, simple time-off request flow, visibility of own leave balances.
+- **Pain points:** *Not specified* explicitly.
+- **Interaction:** Logs in with system-issued Login ID/password, views own profile (limited edit on About/Skills-type sections), views own day-wise attendance for the current month, creates time-off requests, cannot see Salary Info or other employees' Attendance/Time Off records.
 
-No other personas are described or drawn. *(No "Super Admin", "Manager-only", or "Payroll Officer" persona appears in either source — do not assume one.)*
+No other personas are stated or diagrammed; no additional personas are inferred.
 
 ---
 
 ## User Stories
 
-- As an **Employee**, I want to check in and check out, so that my attendance is recorded automatically.
-- As an **Employee**, I want to view my daily/weekly/monthly attendance, so that I can confirm it is accurate.
-- As an **Employee**, I want to apply for leave (choosing a leave type and date range, with optional remarks/attachment), so that I can request time off.
-- As an **Employee**, I want to view my leave balances (e.g., Paid Time Off, Sick Time Off) and the status of my requests (Pending/Approved/Rejected), so that I know where I stand.
-- As an **Employee**, I want to view my salary structure and payroll (read-only), so that I understand my compensation.
-- As an **Employee**, I want to edit limited profile fields (address, phone, profile picture), so that my details stay current.
-- As an **Admin/HR Officer**, I want to view the list of all employees with their current status, so that I can get a quick overview of who is present/absent/on leave.
-- As an **Admin/HR Officer**, I want to view and edit any employee's full profile, so that I can maintain accurate records.
-- As an **Admin/HR Officer**, I want to view all employees' attendance for the current day, so that I can monitor the workforce.
-- As an **Admin/HR Officer**, I want to view, approve, or reject leave requests (with comments), so that I can manage time off across the company.
-- As an **Admin/HR Officer**, I want to define and update an employee's salary structure (wage, components, deductions), so that payroll stays accurate.
-- As an **Admin/HR Officer**, I want to create new employee accounts (with an auto-generated Login ID and first-time password), so that employees don't need to self-register. *(Diagram-only; see Contradiction #1 below.)*
-- As a **new user setting up the company**, I want to sign up with a company name and logo, so that I can start using Dayflow for my organization. *(Diagram-only; see Contradiction #1 below.)*
+- As an **Admin/HR Officer**, I want to create a new employee account, so that the employee can log in without self-registering.
+- As an **Admin/HR Officer**, I want the system to auto-generate a Login ID and first-time password, so that I don't have to assign credentials manually.
+- As an **Employee**, I want to log in and change my system-generated password, so that my account is secure.
+- As an **Employee**, I want to view my own profile (Resume, Private Info, Skills, Certification), so that I can review and update my information.
+- As an **Employee**, I want to edit limited sections of my profile (About, skills, etc.), so that I can keep my public info current.
+- As an **Admin/HR Officer**, I want full edit access to any employee's profile, so that I can maintain accurate records.
+- As an **Admin/HR Officer**, I want to view and edit an employee's Salary Info tab, so that I can manage compensation.
+- As any **user**, I want to see a grid of employee cards with status indicators, so that I can quickly see who is present, on leave, or absent.
+- As any **user**, I want to click an employee card to open their profile, so that I can view details (view-only for non-admins).
+- As any **user**, I want to check in and check out from a systray control on any page, so that my attendance is recorded without navigating away.
+- As an **Employee**, I want to see my own day-wise attendance for the current month, so that I can track my work hours.
+- As an **Admin/HR Officer**, I want to see all employees' attendance for the current day (with filters), so that I can monitor presence.
+- As an **Employee**, I want to submit a time-off request (type, dates, allocation, attachment for sick leave), so that I can request leave.
+- As an **Employee**, I want to see only my own time-off records, so that my requests are private from other employees.
+- As an **Admin/HR Officer**, I want to view all employees' time-off requests and approve or reject them, so that I can manage leave centrally.
+- As an **Admin/HR Officer**, I want to manage leave allocations per employee/type, so that balances stay accurate.
+- As the **system**, payable days should be calculated from attendance and approved/unpaid leave, so that salary computation is accurate. *(Inference: phrased as a system behavior implied by the "Business Rules" section, not a literal user story in the source.)*
 
 ---
 
 ## Core Features
 
-### 1. Authentication & Authorization
-- **Purpose:** Secure access, separated by role.
-- **Description:** Sign Up and Sign In flows; role-based access (Admin vs Employee).
-- **Inputs (per text):** Employee ID, Email, Password, Role (Employee/HR) at sign-up; Email + Password at sign-in.
-- **Inputs (per diagram — Sign Up screen):** Name, Email, Phone, Password, Confirm Password, Company Name, Upload Logo. **(Contradiction — see below.)**
-- **Inputs (per diagram — Sign In screen):** Login ID/Email, Password.
-- **Outputs:** Authenticated session; redirect to landing page.
-- **Dependencies:** Email verification (text only — not shown in diagram). Password security rules (text only — specific rules not specified in either source; `Not specified`).
-- **Edge cases:** Incorrect credentials → error message (text). No password-reset flow is described or drawn in either source (`Not specified`).
-- **Acceptance criteria:** A user can register/be provisioned, log in with valid credentials, and is denied login with invalid credentials with a visible error message.
+### 1. Authentication & Onboarding
+- **Purpose:** Control who can access the system and how accounts are created.
+- **Description:** Sign-in page (Login ID/Email + Password). Sign-up page exists in the UI but employees cannot complete self-registration; accounts are created only by Admin/HR, who triggers auto-generation of a Login ID (format `[OI][First2FirstName][First2LastName][YearOfJoining][4-digit serial]`, e.g. `OIJODO20220001`) and a first-time password.
+- **User value:** Secure, controlled onboarding; no unauthorized self-signup.
+- **Functional behavior:** Admin submits employee creation form → system generates Login ID + password → employee can log in and (may) change the password.
+- **Inputs:** Company Name, Name, Email, Phone, Password, Confirm Password, Upload Logo (Sign-Up form fields as designed — **Note:** the Sign-Up form as designed collects company-level fields; how this reconciles with "employees cannot self-register" is flagged below in Contradictions/Ambiguities).
+- **Outputs:** Authenticated session; generated Login ID and first-time password.
+- **Dependencies:** Employee Service (for Login ID generation), password hashing.
+- **Edge cases:** Duplicate name-initials in the same joining year (serial number increments — exact collision-handling logic is `Not specified`); forced vs. optional password change is `Not specified` ("forced / allowed to change the password").
+- **Acceptance criteria:** An Admin-created employee can log in using the generated Login ID and first-time password; a normal user cannot complete account creation from the Sign-Up screen.
 
-> **Contradiction (Text vs. Diagram):** The text (§3.1.1) describes **employee self-registration** with Employee ID/Email/Password/Role. The diagram's Sign Up screen instead collects **Name, Email, Phone, Password, Confirm Password, Company Name, and a company Logo upload** — consistent with an *organization/admin* sign-up, not an individual employee sign-up. A diagram annotation explicitly states: *"Normal user cannot register, so when the HR officer or Admin creates a new user/employee, their ID should also be created with this method. Their password should be auto-generated for the first time by the system. They can login and change the system-generated password."* This directly contradicts the text's implication that employees self-register. **This is flagged, not resolved — an implementer must clarify which behavior is correct**, but the diagram's explicit annotation is treated as the more detailed/authoritative source for the registration *mechanism*, while the text is followed for the general presence of a "Sign Up" capability.
+### 2. Employees Dashboard (Card Grid)
+- **Purpose:** Landing page after login; browse and open employee records.
+- **Description:** Header with search bar and a **NEW** button (Admin/HR only). Grid of employee cards, each showing profile picture, name, basic info, and a status indicator (🟢 present, ✈️ on leave, 🟡 absent).
+- **User value:** Quick visual overview of the workforce and fast access to any profile.
+- **Functional behavior:** Cards are clickable → opens the employee's profile (view-only for Employees, editable + Salary tab for Admin/HR).
+- **Inputs:** Search query; NEW button (Admin/HR) to create an employee.
+- **Outputs:** Filtered card grid; navigation to profile.
+- **Dependencies:** Employee Service, Attendance Service (for status icon), Time Off Service (for leave/airplane icon).
+- **Edge cases:** *Not specified* (e.g., behavior with zero search results).
+- **Acceptance criteria:** All employees render as cards with an accurate, real-time status icon; clicking a card opens the correct profile in the correct mode for the current role.
 
-> **Diagram-only detail:** Login IDs are auto-generated in the format `[OI][first two letters of first name + first two letters of last name][year of joining][serial number of joining]`, e.g. `OIJODO20220001` (where "OI" = company-name-derived prefix, shown in the annotation as "Odoo India"). **Inference:** the literal prefix "OI" appears to be sourced from a specific reference company name; whether the prefix is configurable per company is `Not specified`.
+### 3. My Profile / Employee Profile
+- **Purpose:** Store and display employee identity, resume-style info, private info, skills, certifications, and (Admin-only) salary.
+- **Description:** Header block (photo, name, Login ID, email, mobile, company, department, manager, location) plus tabs: Resume, Private Info, Skills, Certification, Salary Info (Admin only).
+- **User value:** Single place for all employee-related data.
+- **Functional behavior:** Employee can edit limited sections (About, "What I love about my job", "My interests and hobbies", Skills, Certification add). Admin has full edit control on any profile, including Salary Info.
+- **Inputs:** Free-text fields (About, job-love, hobbies); Private Info form fields (DOB, Gender, Nationality, Marital Status, Personal Email, Residing Address, Bank Name, Account Number, IFSC Code, PAN No, UAN No, Date of Joining, Job Position, Emp Code); Skills list; Certification list.
+- **Outputs:** Persisted employee profile record.
+- **Dependencies:** Employee Service.
+- **Edge cases:** *Not specified* (e.g., field validation rules for PAN/IFSC format are not detailed).
+- **Acceptance criteria:** Employee cannot see or edit Salary Info; Employee edits are restricted to the stated limited sections; Admin can view/edit all sections including Salary Info.
 
-### 2. Landing Page After Login
-- **Diagram evidence:** An annotation explicitly states *"After login the user must land on this page"* next to the **Employees (list) page**, not a "Dashboard."
-- **Description:** Top navigation bar (Company Logo, Employees, Attendance, Time Off) + a searchable grid of employee cards. Each card shows the employee's profile picture, basic info, and a status icon in the top-right corner:
-  - 🟢 Green dot = present in the office
-  - ✈️ Airplane icon = on leave
-  - 🟡 Yellow dot = absent (no time-off applied, not present)
-- Cards are clickable and open the selected employee's profile in a **view-only (non-editable)** mode.
+### 4. Salary Info (Admin only)
+- **Purpose:** Define wage and compute salary components/deductions per employee.
+- **Description:** Wage Type (Fixed wage), Working Schedule (days/week), auto-calculated Salary Components (Basic Salary, HRA, Standard Allowance, Performance Bonus, Leave Travel Allowance, Fixed Allowance), Tax Deductions (Professional Tax, Provident Fund — employee & employer contribution), and Month/Yearly Wage display (₹/month, optional hourly rate).
+- **User value:** Automates payroll component calculation from a single wage input.
+- **Functional behavior (computation rules as stated):**
+  - Basic Salary = % of wage/company cost (example: 50% → 25000)
+  - House Rent Allowance = 50% of Basic (example: 12500)
+  - Standard Allowance = Fixed amount (example: 4167)
+  - Performance Bonus = % of Basic (example: 8.33%)
+  - Leave Travel Allowance = % of Basic (example: 8.33%)
+  - Fixed Allowance = Wage − sum of all other components
+  - Professional Tax deducted from Gross
+  - Provident Fund calculated on Basic Salary (employee + employer contribution, exact % `Not specified`)
+- **Inputs:** Wage amount, working days/week, applicable percentages.
+- **Outputs:** Computed salary component breakdown; payslip figures.
+- **Dependencies:** Attendance Service (payable days), Employee Service.
+- **Edge cases:** Exact PF percentage, Professional Tax slab/amount, and rounding rules are `Not specified`.
+- **Acceptance criteria:** Given a wage and the stated percentages, the system computes all listed components and deductions consistently with the formulas above.
 
-> **Contradiction (Text vs. Diagram):** The text (§3.2) describes a dedicated **"Dashboard"** for both roles — an Employee Dashboard with quick-access cards (Profile, Attendance, Leave Requests, Logout) and an Admin/HR Dashboard (Employee list, Attendance records, Leave approvals). **No such Dashboard screen appears anywhere in the diagram.** Instead, the diagram's landing screen is the Employees list page described above, and the functions the text assigns to a "Dashboard" (viewing the employee list, attendance, leave) are instead reached via the top navigation bar and the profile avatar dropdown (My Profile, Log Out). This is flagged as an unresolved contradiction.
+### 5. Attendance
+- **Purpose:** Track daily presence and working hours; feed payroll.
+- **Description:** Employee view shows own day-wise attendance for the current month (date navigation, summary cards: days present, leaves count, total working days; per-day: Date, Day, Check In, Check Out, Work Hours, Extra hours, Break Time). Admin/HR view shows all employees present on the current day with filters and date navigation. Check-In/Check-Out available via systray from any page; status indicator flips red → green on successful check-in, with a running "Since HH:MMPM" timer.
+- **User value:** Accurate, low-friction time tracking that automatically informs payroll.
+- **Functional behavior:** Attendance is the basis for payable-days calculation; unpaid leave or missing attendance automatically reduces payable days.
+- **Inputs:** Check-In/Check-Out action (timestamp).
+- **Outputs:** Per-day attendance record; aggregated monthly summary; payable-days figure for payroll.
+- **Dependencies:** Time Off Service (approved leave affects payable days), Payroll/Salary Service (consumes payable days).
+- **Edge cases:** Break-time capture mechanism is `Not specified`; multiple check-in/out per day is `Not specified`.
+- **Acceptance criteria:** A completed check-in/check-out pair produces a correct Work Hours value for that day; monthly summary counts match the underlying day rows; payable days correctly subtract unpaid/missing days.
 
-### 3. Employee Profile Management
-- **Purpose:** Central record of employee data.
-- **Description:** Profile header (photo, Name, Job Position, Email, Mobile, Company, Department, Manager, Location, Login ID) plus tabs/sections:
-  - **Resume** (label present in diagram; content `Not specified`)
-  - **Private Info**: Date of Birth, Residing Address, Nationality, Personal Email, Gender, Marital Status, Bank Details (Account Number, Bank Name, IFSC Code, PAN No, UAN No, Emp Code, Date of Joining)
-  - **Salary Info** — visible to Admin only (annotated explicitly); see Feature 5.
-  - **Settings** → Security (content `Not specified` beyond the label)
-  - About/bio, "What I love about my job," "My interests and hobbies" (free-text sections), Skills, "+ Add Skills", Certification
-- **User value:** Employees maintain accurate personal records; Admin/HR maintain full company records.
-- **Inputs:** Free text/structured fields as listed above.
-- **Outputs:** Rendered profile view (editable for the owner/Admin; read-only for others viewing via the Employees list).
-- **Dependencies:** Authentication/role check (to gate Salary Info and edit rights).
-- **Edge cases:** *Not specified* (e.g., no validation rules for bank details/PAN/IFSC format are given in either source).
-- **Acceptance criteria:** An Employee can view their own full profile and edit address/phone/profile picture; an Admin can view and edit all fields for any employee; a non-owner Employee viewing another profile via the Employees list sees a read-only view.
-
-### 4. Attendance Management
-- **Purpose:** Track and view attendance.
-- **Description (text):** Daily/weekly views; check-in/check-out; statuses: Present, Absent, Half-day, Leave.
-- **Description (diagram):**
-  - **Employee view:** Check In / Check Out systray control (a status dot that is red before check-in and turns green after a successful check-in, per annotation). Day-wise attendance table for the current month by default: Date, Check In, Check Out, Work Hours, Extra Hours, with prev/next date navigation.
-  - **Admin/HR view:** Shows all employees present on the current day, month navigation, and summary widgets: "Count of days present," "Leaves count," "Total working days."
-- **Diagram-only detail:** *"Attendance data serves as the basis for payslip generation... Any unpaid leave or missing attendance days should automatically reduce the number of payable days during payslip computation."* This links Attendance directly to Payroll — a dependency not stated explicitly in the text.
-- **Dependencies:** Authentication (own vs. all-employee view); feeds Payroll computation.
-- **Edge cases:** `Not specified` (e.g., missed check-out, late check-in penalties are not defined).
-- **Acceptance criteria:** An Employee sees only their own attendance; Admin/HR sees all employees' attendance; check-in/check-out updates the record and the status indicator in real time.
-
-### 5. Leave & Time-Off Management
-- **Purpose:** Request and approve time off.
-- **Description (text):** Employees select leave type (Paid/Sick/Unpaid), a date range, and remarks; status is Pending/Approved/Rejected. Admin/HR views all requests, approves/rejects with comments; changes reflect immediately.
-- **Description (diagram):**
-  - **Employee view:** Summary cards per leave type (e.g., "Paid Time Off — 24 Days Available," "Sick Time Off — 07 Days Available"), a "New" request button opening a form: Employee (auto-filled), Time off Type (dropdown: Paid Time Off / Sick Leave / Unpaid Leaves), Validity Period (date range), Allocation (number of days), Attachment (annotated *"For sick leave certificate"*), Submit/Discard buttons.
-  - **Admin/HR view:** Same summary cards plus a searchable list/table of all requests: Name, Start Date, End Date, Time off Type, Status, with Approve/Reject buttons.
-- **User value:** Self-service leave requests; centralized approval for Admin/HR.
-- **Dependencies:** Authentication (own vs. all-employee scope); leave balance must be tracked to display "days available."
-- **Edge cases:** `Not specified` (e.g., what happens if requested days exceed the available balance is not defined in either source).
-- **Acceptance criteria:** An Employee can submit a leave request with a type, date range, and optional attachment, and see it appear as Pending; an Admin can see it in the list and Approve/Reject it with the status reflected immediately for the Employee.
-
-### 6. Payroll / Salary Management
-- **Purpose:** Manage and display compensation.
-- **Description (text):** Employee payroll view is read-only; Admin can view all payroll, update salary structure, and ensure payroll accuracy.
-- **Description (diagram — Admin-only "Salary Info" tab):**
-  - **Wage Type:** Fixed wage, entered as Month Wage / Yearly Wage.
-  - Additional fields: No. of working days per week, Break Time.
-  - **Salary Components** (auto-calculated from Wage, each with a computation type of Fixed Amount or Percentage of Wage):
-    - Basic Salary — percentage of Wage (worked example: 50% of ₹50,000 = ₹25,000)
-    - House Rent Allowance (HRA) — percentage of Basic (worked example: 50% of Basic = ₹12,500)
-    - Standard Allowance — fixed amount (worked example: ₹4,167/month)
-    - Performance Bonus — percentage of Basic (worked example: 8.33%)
-    - Leave Travel Allowance (LTA) — percentage of Basic (worked example: 8.33%)
-    - Fixed Allowance — remainder: Wage minus the total of all other components
-  - **Constraint (diagram-only):** "Salary component values should auto-update when the wage amount changes. The total of all components should not exceed the defined Wage."
-  - **Tax Deductions:**
-    - Provident Fund (PF) — Employer 12% and Employee 12%, each calculated on Basic Salary (worked example: ₹3,000)
-    - Professional Tax — fixed ₹200/month
-- **User value:** Automates payroll math from a single wage input; gives Admin fine control, gives Employees transparent (read-only) visibility.
-- **Dependencies:** Attendance data (payable days), Basic Salary (drives HRA, PF, bonuses).
-- **Edge cases:** `Not specified` (e.g., mid-cycle wage changes, prorated first/last month).
-- **Acceptance criteria:** Given a Wage value, all salary components and deductions calculate automatically per the percentages/fixed amounts above, and the Employee sees the resulting structure read-only.
+### 6. Time Off
+- **Purpose:** Request, allocate, and approve/reject leave.
+- **Description:** Leave Balance Cards (e.g., Paid Time Off 24 days, Sick Time Off 7 days). List/table of requests (Name, Start Date, End Date, Type, Status). Employees see and create only their own requests. Admin/HR see all requests, with Approve/Reject actions, plus an Allocation tab to manage balances per employee/type.
+- **User value:** Structured, auditable leave workflow with clear balances.
+- **Functional behavior:** Request form: Employee (pre-filled or selectable for Admin), Time Off Type (Paid Time Off / Sick Leave / Unpaid Leaves), Validity Period (start–end), Allocation (e.g., 1.00 Days), Attachment (esp. for Sick Leave), Submit/Discard. Approval updates leave status (reflected as the airplane icon on the Employees dashboard) and feeds payable-days calculation.
+- **Inputs:** Type, date range, allocation amount, optional attachment.
+- **Outputs:** Time-off request record with status (e.g., pending/approved/rejected — exact status values `Not specified` beyond "Approve/Reject" actions).
+- **Dependencies:** Employee Service, Attendance/Payroll (payable days).
+- **Edge cases:** Overlapping requests, partial-day requests, and balance-exceeding requests are `Not specified`.
+- **Acceptance criteria:** Employee can submit a request that appears in their own list with correct type/dates; Admin can approve/reject and the resulting status is reflected on the Employees dashboard status icon and in payable-days calculation.
 
 ---
 
 ## Functional Requirements
 
-- **FR-001:** The system shall provide a Sign Up flow that collects at minimum: name/company identity, email, password, and (per diagram) company name and logo for initial account creation.
-- **FR-002:** The system shall provide a Sign In flow using Login ID/Email and Password, and display an error message on invalid credentials.
-- **FR-003:** The system shall auto-generate a unique Login ID for each employee account in the format `[Company Prefix][First 2 letters of first name][First 2 letters of last name][Year of Joining][Serial Number]`. *(Diagram-only.)*
-- **FR-004:** The system shall auto-generate a first-time password for employee accounts created by Admin/HR, and allow the employee to change it after first login. *(Diagram-only.)*
-- **FR-005:** The system shall enforce role-based access such that only Admin/HR Officer can view/edit the "Salary Info" tab of any employee profile.
-- **FR-006:** The system shall display, immediately after login, a searchable list of employees with each employee's profile photo and a current attendance/leave status indicator (present / on leave / absent).
-- **FR-007:** The system shall allow Employees to view their own full profile and edit their address, phone number, and profile picture.
-- **FR-008:** The system shall allow Admin/HR to view and edit all fields of any employee's profile.
-- **FR-009:** The system shall allow a non-owner viewer to open another employee's profile in a read-only (view-only) mode by clicking their card in the Employees list.
-- **FR-010:** The system shall provide a Check In / Check Out control for Employees that records timestamps and updates a visual status indicator.
-- **FR-011:** The system shall display an Employee's own day-wise attendance (Date, Check In, Check Out, Work Hours, Extra Hours) for the current month by default, with navigation between dates/months.
-- **FR-012:** The system shall allow Admin/HR to view the attendance of all employees for the current day, plus summary counts (days present, leaves taken, total working days) for a selectable month.
-- **FR-013:** The system shall use recorded attendance (including unpaid leave and missing attendance) to reduce payable days in payroll computation. *(Diagram-only.)*
-- **FR-014:** The system shall allow Employees to view their leave balances by type (e.g., Paid Time Off, Sick Time Off) as a remaining-days count.
-- **FR-015:** The system shall allow Employees to submit a leave request specifying leave type (Paid/Sick/Unpaid), a date range, an optional remark, and an optional attachment (e.g., for sick leave).
-- **FR-016:** The system shall allow Admin/HR to view all leave requests, and Approve or Reject each with an optional comment, updating the requester's record immediately.
-- **FR-017:** The system shall restrict Employees to viewing only their own leave requests and attendance; Admin/HR shall be able to view all employees' records.
-- **FR-018:** The system shall allow Admin to define an employee's Wage (fixed wage type) and automatically compute Basic Salary, HRA, Standard Allowance, Performance Bonus, LTA, and Fixed Allowance from it, per the percentages/formulas in Feature 6.
-- **FR-019:** The system shall automatically compute Provident Fund (Employer/Employee, % of Basic) and Professional Tax (fixed amount) as payroll deductions.
-- **FR-020:** The system shall prevent the sum of all salary components from exceeding the defined Wage.
-- **FR-021:** The system shall display an Employee's own salary/payroll information as read-only.
+- **FR-001:** The system shall prevent employees from completing self-registration/sign-up.
+- **FR-002:** The system shall allow Admin/HR to create employee accounts.
+- **FR-003:** The system shall auto-generate a Login ID using the format `[OI][First2FirstName][First2LastName][YearOfJoining][4-digit serial]`.
+- **FR-004:** The system shall auto-generate a first-time password for each newly created employee.
+- **FR-005:** The system shall allow an employee to log in with the Login ID/Email and password.
+- **FR-006:** The system shall allow a logged-in employee to change their password.
+- **FR-007:** The system shall display an Employees dashboard as the post-login landing page, showing employee cards in a grid.
+- **FR-008:** The system shall show a real-time status indicator (present / on leave / absent) on each employee card.
+- **FR-009:** The system shall allow searching the Employees dashboard.
+- **FR-010:** The system shall allow Admin/HR to open an employee creation form via a "NEW" button.
+- **FR-011:** The system shall open an employee's profile in view-only mode when a non-admin clicks a card.
+- **FR-012:** The system shall open an employee's profile in editable mode, including Salary Info, when Admin/HR clicks a card or opens "My Profile"/an employee record.
+- **FR-013:** The system shall restrict the Salary Info tab to Admin/HR only.
+- **FR-014:** The system shall let employees edit only specific profile sections (About, "what I love about my job," interests/hobbies, Skills, Certification) while Admin/HR can edit all sections.
+- **FR-015:** The system shall calculate salary components (Basic, HRA, Standard Allowance, Performance Bonus, Leave Travel Allowance, Fixed Allowance) from a defined wage, per the stated formulas.
+- **FR-016:** The system shall calculate Professional Tax and Provident Fund deductions (employee and employer contributions).
+- **FR-017:** The system shall record Check-In and Check-Out timestamps from a systray control available on any page.
+- **FR-018:** The system shall flip the status indicator from red to green on successful check-in and show an elapsed-time timer.
+- **FR-019:** The system shall show an employee their own day-wise attendance for the current month, with a monthly summary (days present, leaves, total working days).
+- **FR-020:** The system shall show Admin/HR the attendance of all employees present on the current day, with filters.
+- **FR-021:** The system shall compute payable days from attendance records, automatically reducing payable days for unpaid leave or missing attendance.
+- **FR-022:** The system shall let employees create time-off requests specifying type, date range, allocation, and (for sick leave) an attachment.
+- **FR-023:** The system shall restrict an employee's Time Off view to their own requests.
+- **FR-024:** The system shall let Admin/HR view all employees' time-off requests and approve or reject them.
+- **FR-025:** The system shall let Admin/HR manage leave allocations per employee and type.
+- **FR-026:** The system shall display leave balance cards (e.g., Paid Time Off, Sick Time Off) with remaining days available.
+- **FR-027:** The system shall reflect approved time-off as an updated status icon (✈️) on the relevant employee's card.
 
 ---
 
@@ -177,92 +182,92 @@ No other personas are described or drawn. *(No "Super Admin", "Manager-only", or
 
 | Category | Requirement |
 |---|---|
-| Performance | Not specified |
-| Security | Password security rules referenced in text but not detailed (`Not specified`); role-based access control is required (Admin vs Employee), including field-level gating of Salary Info. |
-| Scalability | Not specified |
-| Reliability | Not specified |
-| Accessibility | Not specified |
-| Maintainability | Not specified |
-| Availability | Not specified |
-| Data integrity | Salary component totals must not exceed the defined Wage (diagram-only constraint). Attendance records must accurately drive payroll payable-days calculation (diagram-only). |
-| Privacy | Not specified (though the system does store sensitive data: bank details, PAN, UAN — no explicit privacy/compliance requirement is stated in either source; this is a notable gap worth raising with stakeholders). |
-| Compatibility | Not specified (no target browsers/devices/platforms mentioned; wireframes suggest a desktop/web layout, not confirmed as responsive). |
+| Performance | `Not specified` |
+| Security | Role-based access control (Admin/HR vs Employee) is explicitly required; password hashing is implied by "auto-generated first-time password" handling but hashing algorithm is `Not specified`. |
+| Scalability | `Not specified` |
+| Reliability | `Not specified` |
+| Accessibility | `Not specified` |
+| Maintainability | `Not specified` |
+| Availability | `Not specified` |
+| Data integrity | Payable-days/payroll figures must derive consistently from Attendance + Time Off (**stated as a business rule**, treated here as a data-integrity requirement). |
+| Privacy | Employee Time Off and Attendance visibility is strictly scoped to "own records" vs. "all records" by role (**stated rule**). |
+| Compatibility | Described as "web/app-based" — specific browsers/devices `Not specified`. |
 
 ---
 
 ## User Flows
 
-### Flow 1: New Employee Onboarding (as depicted across both sources, reconciled)
+### Flow 1 — Employee onboarding and first login
 ```mermaid
-flowchart TD
-    A[Admin/HR signs up company - Name, Email, Phone, Password, Company Name, Logo] --> B[Admin logs in]
-    B --> C[Admin creates new Employee record]
-    C --> D[System auto-generates Login ID and first-time password]
-    D --> E[Employee logs in with Login ID/Email + auto-generated password]
-    E --> F[Employee changes password on first login]
-    F --> G[Employee lands on Employees list page]
-```
-*Note: Step D→F is sourced entirely from a diagram annotation; the text's §3.1.1 self-registration flow is not depicted as compatible with this and is flagged as a contradiction (see Feature 1 above).*
+sequenceDiagram
+    participant Admin as Admin/HR
+    participant Sys as System
+    participant Emp as Employee
 
-### Flow 2: Daily Attendance
-```mermaid
-flowchart TD
-    A[Employee logs in] --> B[Employee clicks Check In]
-    B --> C[Status dot turns green; timestamp recorded]
-    C --> D[Employee works]
-    D --> E[Employee clicks Check Out]
-    E --> F[Work Hours / Extra Hours calculated for the day]
-    F --> G[Record feeds Attendance table and Payroll payable-days calculation]
+    Admin->>Sys: Create employee (NEW button, employee form)
+    Sys->>Sys: Generate Login ID (OI+Initials+Year+Serial)
+    Sys->>Sys: Generate first-time password
+    Sys-->>Admin: Return Login ID + password
+    Emp->>Sys: Sign in with Login ID + password
+    Sys-->>Emp: Redirect to Employees Dashboard
 ```
 
-### Flow 3: Leave Request & Approval
+### Flow 2 — Card click → profile view (role-scoped)
 ```mermaid
-flowchart TD
-    A[Employee opens Time Off page] --> B[Employee clicks New]
-    B --> C[Fills Time off Type, Validity Period, Allocation, optional Attachment]
-    C --> D[Employee clicks Submit]
-    D --> E[Request status: Pending]
-    E --> F[Admin/HR opens Time Off list]
-    F --> G{Approve or Reject}
-    G -->|Approve| H[Status: Approved - reflected on Employee record]
-    G -->|Reject| I[Status: Rejected - reflected on Employee record]
+flowchart LR
+    A[Employees Dashboard - Card Grid] -->|Employee clicks card| B[Profile - View Only]
+    A -->|Admin/HR clicks card| C[Profile - Editable + Salary Info tab]
 ```
 
-### Flow 4: Salary Configuration
+### Flow 3 — Attendance to payroll
 ```mermaid
-flowchart TD
-    A[Admin opens Employee Profile] --> B[Admin opens Salary Info tab - Admin only]
-    B --> C[Admin enters Wage - Month or Yearly]
-    C --> D[System auto-calculates Basic, HRA, Standard Allowance, Performance Bonus, LTA, Fixed Allowance]
-    D --> E[System auto-calculates PF - Employer/Employee and Professional Tax]
-    E --> F[Employee views resulting structure - read only]
+flowchart LR
+    A[Systray Check-In/Check-Out] --> B[Attendance Record - per day]
+    B --> C[Monthly Attendance Aggregation]
+    D[Time Off Approval] --> E[Leave Status]
+    C --> F[Payable Days Calculation]
+    E --> F
+    F --> G[Salary Components + PF + Professional Tax]
+    G --> H[Payslip]
 ```
+
+### Flow 4 — Time-off request and approval
+```mermaid
+flowchart LR
+    A[Employee opens Time Off] --> B[Submits Request: type, dates, allocation, attachment]
+    B --> C[Request appears in Employee's own list - Pending]
+    B --> D[Request appears in Admin all-employee list]
+    D --> E{Admin decision}
+    E -->|Approve| F[Status: Approved -> feeds payable days + card icon]
+    E -->|Reject| G[Status: Rejected]
+```
+
+These four flows are directly supported by the source's "Interconnections Between Panels" and "Key Data Flows" sections; no additional flows were invented.
 
 ---
 
 ## Acceptance Criteria
 
-- **Authentication:** Users can be provisioned/log in with role-appropriate access; invalid credentials are rejected with a visible error.
-- **Employees list:** Landing page shows all employees with live status icons; search filters the grid; clicking a card opens a read-only profile.
-- **Profile:** Owner/Admin edits persist and are reflected immediately; Salary Info is inaccessible to non-Admin viewers.
-- **Attendance:** Check-in/out updates the record and status indicator; Employee sees only their own data; Admin sees all employees' data for the current day plus monthly summaries.
-- **Leave:** A submitted request appears as Pending for both the Employee and Admin/HR; an Approve/Reject action updates status immediately for both.
-- **Payroll:** Changing Wage recalculates all dependent components and deductions automatically; components never exceed Wage in total.
+- **Authentication:** An employee cannot reach an authenticated area via self-registration; an Admin-created account can log in with its generated credentials.
+- **Employees Dashboard:** Status icons match the underlying attendance/leave state; card click routes to the correct profile mode by role.
+- **Profile:** Non-admin edits are limited to the stated sections; Salary Info is inaccessible to non-admins in the UI and (by extension) must be enforced server-side.
+- **Salary Info:** Component values follow the stated formulas for a given wage input.
+- **Attendance:** Check-in/out via systray updates the record and the live status indicator; monthly summary reflects the day rows; payable days reduce correctly for unpaid/missing days.
+- **Time Off:** Employees see only their own requests; Admin sees all and can approve/reject; approved leave updates payable days and the card status icon.
 
 ---
 
 ## Scope
 
-**In Scope (explicitly stated/drawn):**
-- Sign Up / Sign In (mechanism disputed — see Contradiction #1)
-- Role-based access (Admin vs Employee)
-- Employee profile management (view/edit, Private Info, Salary Info, Resume, Settings)
-- Attendance tracking (check-in/out, daily/monthly views, employee vs admin scope)
-- Leave/time-off management (request, balances, approval workflow)
-- Payroll/salary structure definition and read-only employee visibility
+**In Scope** (explicitly described and diagrammed):
+- Authentication (sign-in; sign-up screen exists but is not a functional self-registration path for employees)
+- Admin-driven employee creation with auto-generated Login ID/password
+- Employees dashboard (card grid, search, status icons)
+- My Profile / Employee Profile (Resume, Private Info, Skills, Certification, Salary Info)
+- Attendance (Check-In/Check-Out, day-wise employee view, Admin all-employee current-day view)
+- Time Off (request, own/all views, Approve/Reject, Allocation management, balance cards)
+- Salary/payslip component computation from attendance-driven payable days
 
-**Out of Scope:** Not specified in either source (no explicit exclusions given).
+**Out of Scope:** `Not specified` — the source does not explicitly list exclusions.
 
-**Future / Planned (from text §6 "Future Enhancements"):**
-- Email & notification alerts
-- Analytics & reports dashboard (e.g., salary slips, attendance reports)
+**Future / Planned:** `Not specified` — no roadmap items beyond the above are stated. **Inference:** forced password change on first login is *implied as possible* ("forced / allowed to change the password") but not committed to either behavior.

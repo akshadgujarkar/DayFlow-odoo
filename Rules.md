@@ -1,54 +1,63 @@
 # Rules.md — AI Development Rules
-## Dayflow — Human Resource Management System (HRMS)
 
-These rules govern any AI agent (or human developer) implementing or extending Dayflow. They are derived only from `PRD.md`, `Architecture.md`, and the two original sources (project description + Excalidraw wireframes) — no generic best-practice rules are imported that aren't grounded in what this project's own sources imply.
+**Project:** Human Resource Management System (HRMS)
+These rules are derived from the project description (`HRMS_Architecture.md`) and the stack decisions recorded in `Architecture.md` (React / Node.js + Express / MySQL via MySQL Workbench / Axios / JWT). They are guardrails for any AI agent (or human) implementing or extending this project.
+
+---
 
 ## General Rules
-1. Treat `PRD.md`, `Architecture.md`, `Rules.md`, `Phases.md`, and `Design.md` as the source of truth for this project. If a task isn't covered by them, stop and ask for clarification rather than inventing behavior.
-2. Do not resolve the two flagged contradictions (registration flow; presence/absence of a "Dashboard") unilaterally. Surface them to a human stakeholder before building the affected feature, since the two sources genuinely disagree.
-3. Anywhere a document says `Not specified` or `TBD`, treat it as an open question requiring stakeholder input — do not silently pick a default (e.g., do not invent a tech stack, a password policy, or a folder structure).
+1. Follow `PRD.md`, `Architecture.md`, `Rules.md`, `Phases.md`, and `Design.md` as the source of truth for this project. Do not reinterpret the original Excalidraw-derived description from memory once these docs exist — update the docs instead if the description changes.
+2. Do not implement any feature, screen, or field not listed in `PRD.md`'s Core Features or `Architecture.md`'s System Components, unless the person explicitly requests an extension.
+3. Where the source material says `Not specified` or `TBD`, do not silently invent behavior — implement the simplest behavior consistent with the stated business rules, and flag the assumption in code comments and the PR/commit description.
+4. Preserve source terminology exactly: "Employees" (not "Staff"), "Time Off" (not "Leave Management"), "My Profile", "Salary Info", "Login ID", "Systray". Do not rename these in code-facing strings, routes, or UI copy without noting the substitution.
 
 ## Technology Rules
-4. Do not choose or assume a specific frontend framework, backend framework, database, or hosting provider on the agent's own authority — none is specified in the source material. If a stack must be chosen to make progress, record the choice explicitly as a project decision (not as something derived from the sources) and get it confirmed.
-5. Do not assume this project runs on or integrates with Odoo. The "OI"/"Odoo India" reference appears only inside a worked example of the Login ID format; it is not evidence of a required platform dependency.
+5. Frontend: React only. Use React Router for navigation between Sign In, Employees Dashboard, Profile, Attendance, Time Off. Do not introduce a second frontend framework.
+6. All frontend → backend calls go through Axios, via a single shared client (`src/api/axiosClient.js`) with the base URL and auth header configured in one place. Do not scatter raw `fetch` calls across components.
+7. Backend: Node.js + Express. Database: MySQL, with schema authored/maintained in MySQL Workbench and exported as the source-of-truth DDL; Sequelize (or an agreed equivalent ORM) maps to that schema. Do not switch database engines or ORMs without updating `Architecture.md` first.
+8. Any new dependency (frontend or backend) must have a clear purpose tied to a feature in `PRD.md`. Avoid adding UI kits, state libraries, or backend frameworks beyond what's listed in `Architecture.md`'s Technology Stack unless justified in a docs update.
 
 ## Code Organization Rules
-6. Since no folder/file structure is specified, propose one only when explicitly asked, and clearly label it as a proposal, not as something derived from the source material.
-7. Keep the six identified modules (Authentication, Employees List, Employee Profile, Attendance, Time Off, Payroll/Salary) as distinct logical boundaries, mirroring the screen/tab structure shown in the wireframes, so that Admin-only gating (Salary Info) stays easy to enforce and audit at a module boundary.
+9. Follow the folder structure proposed in `Architecture.md` (`frontend/src/modules/{auth,layout,employees,profile,attendance,timeoff}`, `backend/src/services/{authService,employeeService,attendanceService,timeOffService,payrollService,notificationService}`). Keep one module/service per HRMS domain area — do not merge Attendance and Time Off logic into one file/service, since the source treats them as distinct panels with distinct permissions.
+10. Keep Axios API call functions grouped per module (`employeeApi.js`, `attendanceApi.js`, etc.), mirroring the backend service boundaries.
+11. Keep role-gating logic (what an Employee vs. Admin/HR can see or do) in a single, reusable place per layer — a `roleGuard` middleware on the backend, and a shared `RoleContext`/route-guard on the frontend — rather than duplicating `if (role === 'admin')` checks ad hoc throughout components/controllers.
 
 ## Architecture Rules
-8. Do not add system components (services, queues, caches, microservices, etc.) that are not implied by the two sources. If a component is required for the feature to function (e.g., a database), flag the addition explicitly as a necessary implementation detail rather than presenting it as something the sources specified.
-9. Preserve the attendance → payroll dependency (attendance/leave data reduces payable days in payslip computation) as a hard dependency between the Attendance and Payroll modules — do not decouple them without stakeholder sign-off, since this is an explicit diagram annotation.
-10. Preserve the Time-Off → Employee-record dependency: an Approve/Reject action must be reflected on the requester's record "immediately," per the text.
+12. Do not change the six-service backend split (Auth & User, Employee, Attendance, Time Off, Payroll/Salary, Notification/Status) without updating `Architecture.md` and documenting the reasoning, since this split is taken directly from the source's own "Suggested Technical Architecture."
+13. Attendance remains the system of record for payable days. Any change to payroll calculation must continue to derive payable days from Attendance + approved/unpaid Time Off — do not hardcode or bypass this pipeline.
+14. Do not add new external integrations (payment gateways, SSO providers, etc.) that are not in `Architecture.md`'s External Integrations section without first updating that document, since the source names none.
 
 ## UI/UX Rules
-11. Preserve the wireframe's global navigation pattern on every authenticated screen: Company Logo (branding) + Employees + Attendance + Time Off, plus a profile avatar dropdown offering "My Profile" and "Log Out."
-12. Preserve the Employees list as the post-login landing page (per the diagram annotation), unless a stakeholder confirms the text's separate "Dashboard" concept should override it.
-13. Preserve the per-card status indicator convention on the Employees list (present/on-leave/absent icons) exactly as annotated; do not invent additional status states not listed in either source (text lists Present/Absent/Half-day/Leave; diagram lists present/on-leave/absent — reconcile any new status only with stakeholder input, since the two lists don't fully match).
-14. Keep Salary Info hidden from non-Admin roles at the UI layer, not just the API layer — this is stated as a visibility rule, not just a data-access rule.
-15. Preserve the profile's view-only mode when a user opens another employee's card from the Employees list, as opposed to the fully editable mode a user gets on their own profile (or that Admin gets on any profile).
+15. Follow `Design.md` for all visual/styling decisions. Do not introduce a new color palette, typography system, or layout pattern that isn't documented there.
+16. Employee cards must always be clickable and must always show a status indicator (present/on leave/absent) as described in the source — do not ship a card view without this.
+17. The Salary Info tab must never render, even in the DOM, for a non-admin session — this is a UI rule in addition to the backend authorization rule below.
 
 ## Error Handling Rules
-16. Display a visible error message on invalid Sign In credentials (explicit text requirement). Do not silently fail or redirect without feedback.
-17. Do not invent error-handling behavior beyond what's specified (e.g., no specific retry, timeout, or offline behavior is defined) — implement minimally sensible handling and flag it as an implementation detail, not a sourced requirement.
+18. Every Axios call must handle both the success and error path; do not leave unhandled promise rejections. Surface backend validation errors (e.g., invalid date range on a Time Off request) to the user in the relevant form, not as a generic error.
+19. Backend endpoints must return consistent error shapes (e.g., `{ error: { code, message } }`) and correct HTTP status codes (400 validation, 401 unauthenticated, 403 unauthorized, 404 not found, 500 server error).
 
 ## Security Rules
-18. Enforce role-based access control for every field/section marked Admin-only in the sources (Salary Info tab; all-employee Attendance and Time-Off views; editing other employees' profiles).
-19. Treat Bank Details, PAN No, UAN No, and salary figures as sensitive data requiring restricted access (Admin and profile-owner only) even though neither source states an explicit privacy/compliance requirement — this follows directly from the stated field-level Admin-only gating pattern already established for Salary Info.
-20. Do not implement or assume a specific password-hashing scheme, token type, or session mechanism without stakeholder confirmation — none is specified.
+20. All role/permission checks described in the source's Access Matrix (§2) must be enforced **server-side**, not only hidden in the UI. Frontend hiding of the Salary Info tab, the all-employee Attendance/Time Off views, and Approve/Reject controls is a UX convenience, not a security boundary.
+21. Passwords (including system-generated first-time passwords) must be hashed before storage; never log or return plaintext passwords in API responses beyond the one-time creation response to Admin.
+22. Login IDs must follow the stated generation format exactly (`[OI][First2FirstName][First2LastName][YearOfJoining][4-digit serial]`); do not alter this format without a documented reason.
+23. File uploads (company logo, sick-leave attachment) must be validated for type/size before storage.
 
 ## Testing Rules
-21. No testing requirements, frameworks, or coverage targets are specified in either source — do not assume a testing strategy; ask if one is required before adding test tooling as part of a "faithful to spec" implementation.
+24. Every backend service must have tests for its role-based authorization paths (e.g., an Employee-role request to a Salary Info or all-employee-Attendance endpoint must be rejected).
+25. Payroll calculation logic (Basic/HRA/Standard Allowance/Performance Bonus/Leave Travel Allowance/Fixed Allowance/PF/Professional Tax) must have unit tests validating the formulas stated in `PRD.md`.
+26. Attendance-to-payable-days logic must have tests covering: full attendance, unpaid leave days, missing/absent days, and approved paid leave.
 
 ## Performance Rules
-22. No performance requirements (latency, load, concurrency) are specified — do not optimize against unstated targets or claim compliance with performance NFRs that don't exist in the sources.
+27. The Employees dashboard (card grid with live status) is the most frequently loaded screen (post-login landing page) — avoid N+1 queries when fetching status per card; prefer a single aggregated query/endpoint.
+28. `Not specified` beyond the above — no other performance targets are given in the source; do not invent specific latency/throughput SLAs.
 
 ## Dependency Rules
-23. Do not add third-party libraries/services beyond what's implied (e.g., an email-verification provider is implied by text §3.1.1 but not named) without flagging the addition and its purpose explicitly.
+29. Pin major versions of React, Express, Sequelize, and MySQL driver in `package.json`; avoid unpinned "latest" ranges for these core dependencies.
+30. Keep the MySQL Workbench-exported schema file under version control (`database/hrms_schema.mwb` + exported `.sql`) so schema changes are traceable and Sequelize migrations stay in sync with it.
 
 ## AI Behavior Rules
-24. Follow `PRD.md`, `Architecture.md`, `Rules.md`, `Phases.md`, and `Design.md` as the operating spec for this project.
-25. Do not modify the module boundaries or the attendance/payroll/time-off dependencies described in `Architecture.md` without explicit justification tied back to the sources.
-26. Do not create speculative functionality beyond what `PRD.md` describes (e.g., do not add notifications, reports, or analytics now — these are explicitly listed as Future/Planned, not current scope).
-27. When encountering genuine ambiguity or a source conflict (e.g., the registration-flow and Dashboard contradictions), ask for clarification rather than guessing — do not pick a side silently.
-28. Keep changes focused: implement one module/feature at a time per `Phases.md`, and avoid touching unrelated modules in the same change.
+31. Always consult `PRD.md`, `Architecture.md`, `Rules.md`, `Phases.md`, and `Design.md` before implementing a new piece of functionality.
+32. Do not modify the documented architecture (service boundaries, data model, role model) without explicit justification recorded in `Architecture.md`'s "Architectural Decisions" table.
+33. Do not create speculative functionality beyond what's in `PRD.md`'s Core Features / Functional Requirements — if a feature seems useful but isn't sourced, propose it rather than silently building it.
+34. When the project description or diagram is genuinely ambiguous (e.g., the Sign-Up form's company-level fields vs. "employees cannot self-register," or whether the first-time password change is forced or optional), ask for clarification rather than guessing; where you must proceed, pick the narrower/safer interpretation and note the assumption.
+35. Keep changes focused: a change to one module (e.g., Time Off) should not require unrelated edits to another module (e.g., Salary Info) unless the dependency is one already documented in `Architecture.md`'s data/application flow.
