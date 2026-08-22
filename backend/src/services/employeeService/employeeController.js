@@ -2,6 +2,7 @@
 
 const { Employee, sequelize } = require('../../models');
 const { generateLoginId } = require('../authService/idGenerator');
+const { Op } = require('sequelize');
 const { generateFirstTimePassword, hashPassword } = require('../authService/passwordHelper');
 
 /**
@@ -71,6 +72,49 @@ async function createEmployee(req, res, next) {
   }
 }
 
+}
+
+/**
+ * Lists employees with optional search.
+ * Includes a stubbed status field.
+ */
+async function getEmployees(req, res, next) {
+  try {
+    const { search } = req.query;
+    
+    let whereClause = {};
+    if (search) {
+      whereClause = {
+        [Op.or]: [
+          { first_name: { [Op.like]: `%${search}%` } },
+          { last_name: { [Op.like]: `%${search}%` } },
+          { email: { [Op.like]: `%${search}%` } }
+        ]
+      };
+    }
+
+    const employees = await Employee.findAll({
+      where: whereClause,
+      attributes: [
+        'id', 'login_id', 'first_name', 'last_name', 'email', 
+        'role', 'department', 'job_position', 'company'
+      ],
+      order: [['created_at', 'DESC']]
+    });
+
+    // Stub status as 'present' for now
+    const enriched = employees.map(emp => ({
+      ...emp.toJSON(),
+      status: 'present'
+    }));
+
+    return res.status(200).json(enriched);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
-  createEmployee
+  createEmployee,
+  getEmployees
 };
