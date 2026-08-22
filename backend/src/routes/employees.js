@@ -14,6 +14,11 @@ const {
   deleteCertification
 } = require('../services/employeeService/employeeController');
 
+const {
+  getEmployeeSalary,
+  updateEmployeeSalary
+} = require('../services/payrollService/salaryController');
+
 const router = Router();
 
 // Phase 2: Create employee (Admin-only)
@@ -29,5 +34,9 @@ router.post('/:id/skills', authGuard, addSkill);
 router.delete('/:id/skills/:skillId', authGuard, deleteSkill);
 router.post('/:id/certifications', authGuard, addCertification);
 router.delete('/:id/certifications/:certId', authGuard, deleteCertification);
+
+// Phase 8: Salary Info endpoints (Admin-only for PUT, and GET could be admin only based on PRD, but let's restrict both for safety since Salary Info tab is admin only)
+router.get('/:id/salary', authGuard, roleGuard('admin'), getEmployeeSalary);
+router.put('/:id/salary', authGuard, roleGuard('admin'), updateEmployeeSalary);
 
 module.exports = router;
