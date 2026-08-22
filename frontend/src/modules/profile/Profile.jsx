@@ -6,6 +6,7 @@ import { Tabs } from '../../components/ui/Tabs';
 import { ResumeTab } from './tabs/ResumeTab';
 import { PrivateInfoTab } from './tabs/PrivateInfoTab';
 import { SkillsAndCertsTab } from './tabs/SkillsAndCertsTab';
+import { SalaryInfoTab } from './SalaryInfoTab';
 import { Badge } from '../../components/ui/Badge';
 
 export function Profile() {
@@ -104,6 +105,13 @@ export function Profile() {
                /> 
     }
   ];
+
+  if (isAdmin) {
+    tabs.push({
+      label: 'Salary Info',
+      content: <SalaryInfoTab employeeId={id} />
+    });
+  }
 
   return (
     <div className="space-y-12 max-w-5xl mx-auto">

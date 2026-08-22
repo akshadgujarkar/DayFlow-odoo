@@ -39,3 +39,17 @@ export const deleteCertification = async (id, certId) => {
   const response = await axiosClient.delete(`/employees/${id}/certifications/${certId}`);
   return response.data;
 };
+
+export const getSalaryInfo = async (id, year, month) => {
+  const params = new URLSearchParams();
+  if (year) params.append('year', year);
+  if (month) params.append('month', month);
+  const qs = params.toString() ? `?${params.toString()}` : '';
+  const response = await axiosClient.get(`/employees/${id}/salary${qs}`);
+  return response.data;
+};
+
+export const updateSalaryInfo = async (id, data) => {
+  const response = await axiosClient.put(`/employees/${id}/salary`, data);
+  return response.data;
+};
