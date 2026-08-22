@@ -1,6 +1,6 @@
 'use strict';
 
-const { AttendanceRecord } = require('../../models');
+const { AttendanceRecord, Employee } = require('../../models');
 const { Op } = require('sequelize');
 
 async function getTodayStatus(req, res, next) {
@@ -89,9 +89,26 @@ async function getMyAttendance(req, res, next) {
   }
 }
 
+async function getAllAttendance(req, res, next) {
+  try {
+    const records = await AttendanceRecord.findAll({
+      include: [{
+        model: Employee,
+        as: 'employee',
+        attributes: ['id', 'first_name', 'last_name', 'email', 'login_id']
+      }],
+      order: [['date', 'DESC']]
+    });
+    return res.status(200).json(records);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   getTodayStatus,
   checkIn,
   checkOut,
-  getMyAttendance
+  getMyAttendance,
+  getAllAttendance
 };
