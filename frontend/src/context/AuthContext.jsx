@@ -1,43 +1,58 @@
-/**
- * AuthContext.jsx
- *
- * Phase 0 stub — full implementation in Phase 3.
- *
- * Will store: JWT token, decoded role, and logged-in user identity.
- * The axiosClient request interceptor will read the token from here
- * to attach the Authorization header (Rules.md §6, §20).
- */
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
-/**
- * AuthProvider wraps the app so any component can access auth state.
- * Phase 3 will implement login(), logout(), token refresh, and role checks.
- */
-export function AuthProvider({ children }) {
-  // Stub state — replace with real JWT parsing / storage in Phase 3.
-  const [auth, setAuth] = useState({
-    token: null,
-    user: null,
-    role: null, // 'admin' | 'employee'
-  });
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const value = {
-    ...auth,
-    setAuth,
-    isAuthenticated: Boolean(auth.token),
-    isAdmin: auth.role === 'admin',
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Failed to parse user from local storage");
+      }
+    }
+    setIsLoading(false);
+
+    const handleUnauthorized = () => {
+      logout();
+    };
+    window.addEventListener('unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('unauthorized', handleUnauthorized);
+  }, []);
+
+  const login = (userData, jwtToken) => {
+    setUser(userData);
+    setToken(jwtToken);
+    localStorage.setItem('token', jwtToken);
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  };
 
-/** Convenience hook for consuming auth state in any component. */
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
-  return ctx;
-}
+  return (
+    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
-export default AuthContext;
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
