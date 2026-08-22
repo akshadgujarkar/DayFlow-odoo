@@ -35,8 +35,15 @@ router.delete('/:id/skills/:skillId', authGuard, deleteSkill);
 router.post('/:id/certifications', authGuard, addCertification);
 router.delete('/:id/certifications/:certId', authGuard, deleteCertification);
 
-// Phase 8: Salary Info endpoints (Admin-only for PUT, and GET could be admin only based on PRD, but let's restrict both for safety since Salary Info tab is admin only)
-router.get('/:id/salary', authGuard, roleGuard('admin'), getEmployeeSalary);
+// Phase 8: Salary Info endpoints (Admin-only for PUT, GET for self or admin)
+router.get('/:id/salary', authGuard, (req, res, next) => {
+  if (req.user.role !== 'admin' && req.user.id !== parseInt(req.params.id, 10)) {
+    return res.status(403).json({
+      error: { code: 'FORBIDDEN', message: 'You can only view your own salary.' }
+    });
+  }
+  next();
+}, getEmployeeSalary);
 router.put('/:id/salary', authGuard, roleGuard('admin'), updateEmployeeSalary);
 
 module.exports = router;

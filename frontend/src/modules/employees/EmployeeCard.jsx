@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 
-export function EmployeeCard({ employee }) {
+export function EmployeeCard({ employee, isClickable }) {
   const navigate = useNavigate();
   
   return (
     <Card 
-      hoverEffect 
-      className="cursor-pointer flex flex-col h-full"
-      onClick={() => navigate(`/profile/${employee.id}`)}
+      hoverEffect={isClickable} 
+      className={`flex flex-col h-full ${isClickable ? 'cursor-pointer' : ''}`}
+      onClick={() => isClickable && navigate(`/profile/${employee.id}`)}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="w-12 h-12 rounded-full bg-muted border border-border flex items-center justify-center text-foreground font-serif text-lg font-bold">

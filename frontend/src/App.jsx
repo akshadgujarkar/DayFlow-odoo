@@ -8,6 +8,8 @@ import { SignUp } from './modules/auth/SignUp';
 import { Dashboard } from './modules/employees/Dashboard';
 import { Profile } from './modules/profile/Profile';
 import { AttendanceModule } from './modules/attendance/AttendanceModule';
+import { TimeOffModule } from './modules/timeoff/TimeOffModule';
+import { LandingPage } from './modules/landing/LandingPage';
 import { useAuth } from './context/AuthContext';
 
 function ProfileRedirect() {
@@ -23,16 +25,13 @@ function App() {
         <Routes>
           <Route path="/login" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/" element={<LandingPage />} />
           
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/attendance" element={<AttendanceModule />} />
-              <Route path="/timeoff" element={
-                <div className="flex justify-center items-center h-64 text-muted-foreground font-serif text-2xl">
-                  Time Off Module Placeholder
-                </div>
-              } />
+              <Route path="/timeoff" element={<TimeOffModule />} />
               <Route path="/profile" element={<ProfileRedirect />} />
               <Route path="/profile/:id" element={<Profile />} />
             </Route>

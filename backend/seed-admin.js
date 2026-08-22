@@ -1,9 +1,13 @@
-const { Employee } = require('./src/models');
+require('dotenv').config();
+const { Employee, sequelize } = require('./src/models');
 const { generateLoginId } = require('./src/services/authService/idGenerator');
 const { generateFirstTimePassword, hashPassword } = require('./src/services/authService/passwordHelper');
 
 async function seed() {
   try {
+    console.log('Syncing database schema...');
+    await sequelize.sync();
+    
     const rawPassword = generateFirstTimePassword();
     const hashedPassword = await hashPassword(rawPassword);
     

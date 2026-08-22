@@ -4,7 +4,7 @@ import { AvatarDropdown } from '../../components/ui/AvatarDropdown';
 
 export function TopNav() {
   const navItems = [
-    { name: 'Employees', path: '/' },
+    { name: 'Employees', path: '/dashboard' },
     { name: 'Attendance', path: '/attendance' },
     { name: 'Time Off', path: '/timeoff' },
   ];

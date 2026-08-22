@@ -30,7 +30,7 @@ export function SignIn() {
       
       const data = await loginApi(credentials);
       login(data.user, data.token);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error?.message || 'Login failed. Please try again.');
     } finally {

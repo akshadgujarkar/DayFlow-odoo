@@ -32,6 +32,12 @@ const TimeOffRequest = sequelize.define('TimeOffRequest', {
   attachment_url: {
     type: DataTypes.STRING(255),
   },
+  remarks: {
+    type: DataTypes.TEXT,
+  },
+  admin_comment: {
+    type: DataTypes.TEXT,
+  },
   status: {
     type: DataTypes.ENUM('Pending', 'Approved', 'Rejected'),
     allowNull: false,

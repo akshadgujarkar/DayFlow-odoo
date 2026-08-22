@@ -94,7 +94,11 @@ export function Dashboard() {
         ) : employees.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {employees.map(emp => (
-              <EmployeeCard key={emp.id} employee={emp} />
+              <EmployeeCard 
+                key={emp.id} 
+                employee={emp} 
+                isClickable={user?.role === 'admin' || user?.id === emp.id}
+              />
             ))}
           </div>
         ) : (

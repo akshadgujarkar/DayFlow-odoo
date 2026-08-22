@@ -166,6 +166,28 @@ async function getEmployeeById(req, res, next) {
     let data = employee.toJSON();
     delete data.password_hash; // never return password hash
 
+    // Compute status
+    const today = new Date().toISOString().split('T')[0];
+    const attendance = await AttendanceRecord.findOne({
+      where: { employee_id: id, date: today }
+    });
+    const activeLeave = await TimeOffRequest.findOne({
+      where: {
+        employee_id: id,
+        status: 'Approved',
+        start_date: { [Op.lte]: today },
+        end_date: { [Op.gte]: today }
+      }
+    });
+
+    if (activeLeave) {
+      data.status = 'leave';
+    } else if (attendance && attendance.check_in_time && !attendance.check_out_time) {
+      data.status = 'present';
+    } else {
+      data.status = 'absent';
+    }
+
     if (!isSelf && !isAdmin) {
       // Read-only, non-sensitive view for peers
       const publicData = {

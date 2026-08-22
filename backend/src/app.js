@@ -35,13 +35,13 @@ app.use('/api', healthRouter);
 const authRoutes = require('./routes/auth');
 const employeeRoutes = require('./routes/employees');
 const attendanceRoutes = require('./routes/attendance');
-// const timeOffRoutes = require('./routes/timeoff');
+const timeOffRoutes = require('./routes/timeoff');
 // const payrollRoutes = require('./routes/payroll');
 // const statusRoutes = require('./routes/status');
 app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/attendance', attendanceRoutes);
-// app.use('/api/timeoff', timeOffRoutes);
+app.use('/api/timeoff', timeOffRoutes);
 // app.use('/api/status', statusRoutes);
 
 // ── Global error handler ─────────────────────────────────────────────────────

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { getSalaryInfo, updateSalaryInfo } from '../../../api/employeeApi';
-import { Button } from '../../../components/ui/Button';
+import { getSalaryInfo, updateSalaryInfo } from '../../api/employeeApi';
+import { Button } from '../../components/ui/Button';
 
-export function SalaryInfoTab({ employeeId }) {
+export function SalaryInfoTab({ employeeId, isAdmin }) {
   const [salaryData, setSalaryData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -61,7 +61,7 @@ export function SalaryInfoTab({ employeeId }) {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-serif text-foreground">Salary Information</h2>
         {!isEditing ? (
-          <Button variant="secondary" onClick={() => setIsEditing(true)}>Edit Configuration</Button>
+          isAdmin && <Button variant="secondary" onClick={() => setIsEditing(true)}>Edit Configuration</Button>
         ) : (
           <div className="space-x-4">
             <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>

@@ -46,6 +46,16 @@ export function Profile() {
   const isAdmin = user.role === 'admin';
   const isEditable = isSelf || isAdmin;
 
+  // Security check: non-admins cannot view profiles other than their own.
+  if (!isSelf && !isAdmin) {
+    return (
+      <div className="py-20 text-center space-y-4">
+        <h2 className="font-serif text-3xl text-red-500">Access Denied</h2>
+        <p className="text-muted-foreground text-lg">You do not have permission to view other employees' personal profiles.</p>
+      </div>
+    );
+  }
+
   const handleUpdate = async (updateData) => {
     try {
       const result = await updateEmployee(id, updateData);
@@ -106,10 +116,10 @@ export function Profile() {
     }
   ];
 
-  if (isAdmin) {
+  if (isEditable) {
     tabs.push({
       label: 'Salary Info',
-      content: <SalaryInfoTab employeeId={id} />
+      content: <SalaryInfoTab employeeId={id} isAdmin={isAdmin} />
     });
   }
 
@@ -126,7 +136,7 @@ export function Profile() {
             <h1 className="text-3xl font-serif text-foreground">
               {employee.first_name} {employee.last_name}
             </h1>
-            <Badge status="present" />
+            <Badge status={employee.status} />
           </div>
           <p className="text-lg text-muted-foreground small-caps mb-4">
             {employee.job_position || 'Employee'} • {employee.department || 'General'}
