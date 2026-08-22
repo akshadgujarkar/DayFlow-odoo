@@ -1,6 +1,6 @@
 'use strict';
 
-const { Employee, Skill, Certification, sequelize } = require('../../models');
+const { Employee, Skill, Certification, AttendanceRecord, TimeOffRequest, sequelize } = require('../../models');
 const { generateLoginId } = require('../authService/idGenerator');
 const { Op } = require('sequelize');
 const { generateFirstTimePassword, hashPassword } = require('../authService/passwordHelper');
@@ -72,11 +72,9 @@ async function createEmployee(req, res, next) {
   }
 }
 
-}
-
 /**
  * Lists employees with optional search.
- * Includes a stubbed status field.
+ * Includes a status field derived from attendance and leave.
  */
 async function getEmployees(req, res, next) {
   try {
@@ -95,25 +93,51 @@ async function getEmployees(req, res, next) {
 
     const employees = await Employee.findAll({
       where: whereClause,
-      attributes: [
-        'id', 'login_id', 'first_name', 'last_name', 'email', 
-        'role', 'department', 'job_position', 'company'
-      ],
+      attributes: { exclude: ['password_hash'] },
       order: [['created_at', 'DESC']]
     });
 
-    // Stub status as 'present' for now
-    const enriched = employees.map(emp => ({
-      ...emp.toJSON(),
-      status: 'present'
-    }));
+    const today = new Date().toISOString().split('T')[0];
 
-    return res.status(200).json(enriched);
+    // Fetch all attendance records and approved leaves for today in bulk
+    const attendances = await AttendanceRecord.findAll({
+      where: { date: today }
+    });
+    
+    const leaves = await TimeOffRequest.findAll({
+      where: {
+        status: 'Approved',
+        start_date: { [Op.lte]: today },
+        end_date: { [Op.gte]: today }
+      }
+    });
+
+    const enrichedEmployees = employees.map(emp => {
+      const empData = emp.toJSON();
+      
+      const isCheckedIn = attendances.some(
+        a => a.employee_id === emp.id && a.check_in_time && !a.check_out_time
+      );
+      
+      const isOnLeave = leaves.some(
+        l => l.employee_id === emp.id
+      );
+
+      if (isOnLeave) {
+        empData.status = 'leave';
+      } else if (isCheckedIn) {
+        empData.status = 'present';
+      } else {
+        empData.status = 'absent';
+      }
+      
+      return empData;
+    });
+
+    return res.status(200).json(enrichedEmployees);
   } catch (error) {
     next(error);
   }
-}
-
 }
 
 /**

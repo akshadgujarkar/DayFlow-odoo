@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getEmployees } from '../../api/employeeApi';
 import { EmployeeCard } from './EmployeeCard';
@@ -12,19 +12,37 @@ export function Dashboard() {
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const fetchEmployees = async (query = '') => {
-    setLoading(true);
+  const fetchEmployees = async (query = '', showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const data = await getEmployees(query);
       setEmployees(data);
     } catch (err) {
       console.error('Failed to fetch employees', err);
+      setError('Failed to load employees.');
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
+
+  const latestSearch = useRef(search);
+  useEffect(() => {
+    latestSearch.current = search;
+  }, [search]);
+
+  useEffect(() => {
+    fetchEmployees(latestSearch.current, true);
+    
+    // Phase 9: Real-time Status Polling every 10 seconds
+    const interval = setInterval(() => {
+      fetchEmployees(latestSearch.current, false);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
