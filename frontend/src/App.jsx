@@ -7,6 +7,7 @@ import { SignIn } from './modules/auth/SignIn';
 import { SignUp } from './modules/auth/SignUp';
 import { Dashboard } from './modules/employees/Dashboard';
 import { Profile } from './modules/profile/Profile';
+import { AttendanceModule } from './modules/attendance/AttendanceModule';
 import { useAuth } from './context/AuthContext';
 
 function ProfileRedirect() {
@@ -26,11 +27,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/attendance" element={
-                <div className="flex justify-center items-center h-64 text-muted-foreground font-serif text-2xl">
-                  Attendance Module Placeholder
-                </div>
-              } />
+              <Route path="/attendance" element={<AttendanceModule />} />
               <Route path="/timeoff" element={
                 <div className="flex justify-center items-center h-64 text-muted-foreground font-serif text-2xl">
                   Time Off Module Placeholder

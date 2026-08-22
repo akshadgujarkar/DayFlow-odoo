@@ -1,17 +1,21 @@
-/**
- * attendanceApi.js
- * Phase 0 stub — functions will be implemented in Phase 6.
- */
 import axiosClient from './axiosClient';
 
-export const checkIn = () =>
-  axiosClient.post('/attendance/check-in');
+export const getTodayStatus = async () => {
+  const response = await axiosClient.get('/attendance/today');
+  return response.data;
+};
 
-export const checkOut = () =>
-  axiosClient.post('/attendance/check-out');
+export const checkIn = async () => {
+  const response = await axiosClient.post('/attendance/check-in');
+  return response.data;
+};
 
-export const getMyAttendance = (params) =>
-  axiosClient.get('/attendance/me', { params });
+export const checkOut = async () => {
+  const response = await axiosClient.post('/attendance/check-out');
+  return response.data;
+};
 
-export const getTodayAttendance = (params) =>
-  axiosClient.get('/attendance/today', { params });
+export const getMyAttendance = async () => {
+  const response = await axiosClient.get('/attendance/my');
+  return response.data;
+};
